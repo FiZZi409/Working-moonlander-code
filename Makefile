@@ -1,45 +1,40 @@
-CC=gcc
-LDFLAGS=-pthread -lcurses -lncurses
-LIBS=libnet.o console_safe.o
-CFLAGS=-Wall
-SOURCES=libnet.c console_safe.c controller.c
+# Java Makefile
+# Dr Alun Moon
+# alun.moon@northumbria.ac.uk
 
-help:
-	@echo "make <target> where target is one of"
-	@echo "        all:   everything"
-	@echo "        run:   make and run 'control'"
-	@echo " controller:   build the contoller program"
-	@echo "       tags:   build the tags file with 'ctags'"
-	@echo "               useful for navigating code in vim"
-	@echo "      clean:   delete files that can be rebuilt"
-	@echo "     pretty:   reformat the code with 'indent -kr'"
-	@echo "       help:   show this help"
-	@echo "consoledocs:   show the help man page for the console library"
-	@echo "    netdocs:   show the help man page for the libnet library"
+%.class:%.java
+	javac $<
 
-all: $(LIBS) controller
+main:=LanderDash
+jarfile:=LanderDash.jar
+sources:=$(wildcard *.java)
+assets=led-green.png led-grey.png led-orange.png led-red.png
 
-run: controller
-	./controller 65200 65250
+classes=$(sources:%.java=%.class)
+innerclasses=$(classes:%.class=%$\*.class)
 
-# controller: controller.c $(LIBS) 
-controller: 
-	$(CC) $(CFLAGS)   controller.c $(LIBS)   -o controller $(LDFLAGS)
+all: tags $(jarfile)
 
-.PHONY: consoledocs netdocs
-consoledocs:
-	groff -man -Tutf8 console.3 | less
-netdocs:
-	groff -man -Tutf8 libnet.3 | less
+jarfile: $(jarfile)
 
-tags: $(SOURCES)
-	ctags $?
+tags: $(sources)
+	ctags --extra=fq $(sources)
 
-.PHONY: clean pretty 
+$(jarfile): $(classes) $(assets)
+	jar cfe $@ $(main) $(classes) $(innerclasses) $(assets)
 
+.PHONY: clean
 clean:
-	rm -f $(LIBS) controller
+	rm -f *.class $(jarfile) tags *.orig
 
-pretty: $(SOURCES)
-	indent -kr $?
+.PHONY: mostlyclean
+mostlyclean:
+	rm  -f *.class $(jarfile)
 
+.PHONY: run
+run: $(jarfile)
+	java -jar $(jarfile) 
+
+.PHONY: pretty
+pretty: $(sources)
+	astyle -q $(sources)

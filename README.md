@@ -1,10 +1,16 @@
-# LanderController
- Skeleton code for KV5002
- (1) use make all to compile 
- ```
- $ make all
- ```
- (2) If the code is complied successfully, run the programme using
+# LanderDash
+Please use the following commands to run the program
+
+```shell
+$ java -jar LanderDash.jar
 ```
- $ ./controller 65200 65250
- ```
+
+
+
+If you need to compile the program, please use the following commands to compile and run the program
+
+```shell
+$ make clean
+$ make 
+$ java -jar LanderDash.jar
+```
